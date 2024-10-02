@@ -83,12 +83,42 @@ static void button()
 {
 
 	static uint32_t off_time;
-	static uint32_t old_s1;
-	static uint32_t old_s2;
+	//static uint32_t old_s1;
+	//static uint32_t old_s2;
 
-	uint32_t new_s2 = LL_GPIO_IsInputPinSet(S2_GPIO_Port, S2_Pin);	// 0 if button is pressed and 1 if button is not pressed
+	static uint32_t last_shift;
+
+	//uint32_t new_s2 = LL_GPIO_IsInputPinSet(S2_GPIO_Port, S2_Pin);	// 0 if button is pressed and 1 if button is not pressed
 	uint32_t new_s1 = LL_GPIO_IsInputPinSet(S1_GPIO_Port, S1_Pin);
 
+
+	if (Tick > last_shift + 5)
+	{
+		static uint16_t debounce = 0xFFFF;
+		debounce <<= 1;
+
+		if (new_s1)
+		{
+			debounce |= 0x0001;
+		}
+
+		if (debounce == 0x8000)	// 0x7FFF for rising edge, 0x8000 is for falling edge
+		{
+			off_time = Tick + LED_TIME_LONG;
+			LL_GPIO_SetOutputPin(LED2_GPIO_Port, LED2_Pin);
+		}
+
+		if (Tick > off_time)
+		{
+			LL_GPIO_ResetOutputPin(LED2_GPIO_Port, LED2_Pin);
+		}
+
+		last_shift = Tick;
+	}
+
+
+
+	/*
 	if (old_s2 && !new_s2) 	// detection of falling edge
 	{
 
@@ -104,14 +134,12 @@ static void button()
 		LL_GPIO_SetOutputPin(LED2_GPIO_Port, LED2_Pin);
 
 	}
+	*/
 
-	old_s1 = new_s1;
-	old_s2 = new_s2;
+	//old_s1 = new_s1;
+	//old_s2 = new_s2;
 
-	if (Tick > off_time)
-	{
-		LL_GPIO_ResetOutputPin(LED2_GPIO_Port, LED2_Pin);
-	}
+
 
 }
 
@@ -165,6 +193,7 @@ int main(void)
 
 
 	  // Button handler function
+	  /*
 	  static uint32_t last_button_tick;
 
 	  if (Tick > last_button_tick + BUTTON_PERIOD)
@@ -172,6 +201,9 @@ int main(void)
 		  last_button_tick = Tick;
 		  button();
 	  }
+	  */
+
+	  button();
 
 
     /* USER CODE END WHILE */
