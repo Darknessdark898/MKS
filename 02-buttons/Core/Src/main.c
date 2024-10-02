@@ -99,7 +99,7 @@ static void button()
 
 		if (new_s1)
 		{
-			debounce |= 0x0001;
+			debounce |= 0x0001;	// enters 1s
 		}
 
 		if (debounce == 0x8000)	// 0x7FFF for rising edge, 0x8000 is for falling edge
