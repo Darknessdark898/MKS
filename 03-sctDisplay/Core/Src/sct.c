@@ -4,7 +4,7 @@
  *  Created on: Oct 9, 2024
  *      Author: 272242
  *
- *      SCT library for controlling 3 digit 7-segment display trough 2 16bit shift registers linked together to one 32bit shift register.
+ *  SCT library for controlling 3 digit 7-segment display trough 2 16bit shift registers linked together to one 32bit shift register.
  *
  *
  */
