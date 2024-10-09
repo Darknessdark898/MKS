@@ -95,7 +95,15 @@ int main(void)
 
   sct_init();
   sct_led(0x7A5C36DE);
+  HAL_Delay(500);
+  sct_value(235);
   HAL_Delay(1000);
+  sct_led(0x7A5C36DE);
+  HAL_Delay(200);
+  sct_value(535);
+  HAL_Delay(1000);
+
+  uint16_t number = 0;
 
   /* USER CODE END 2 */
 
@@ -103,6 +111,17 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  sct_value(number);
+	  number += 111;
+
+	  if (number > 1000)
+	  {
+		  number = 0;
+	  }
+
+	  HAL_Delay(400);
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
