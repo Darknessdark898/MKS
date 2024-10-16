@@ -132,7 +132,7 @@ int main(void)
 
 
 	  HAL_ADC_ConvCpltCallback(&hadc);
-	  sct_value(((avg_pot >> ADC_Q)*500)/4095, raw_pot/512 + 1);
+	  sct_value(((avg_pot >> ADC_Q)*500.9)/4095, (raw_pot*1.1)/512);
 	  HAL_Delay(100);
 
     /* USER CODE END WHILE */
