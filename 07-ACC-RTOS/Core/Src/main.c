@@ -409,8 +409,6 @@ void startVisualTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
-
     int16_t msg;
     if (xQueueReceive(xVisualQueueHandle, &msg, portMAX_DELAY))
     {
@@ -432,6 +430,9 @@ void startVisualTask(void const * argument)
     		HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, RESET);
     	}
     }
+
+    vTaskDelay(50);	// kedze tu mam toto tak som mohol vymazat osDelay(1) na zaciatku
+
   }
   /* USER CODE END startVisualTask */
 }
@@ -459,6 +460,9 @@ void startAcceleroTask(void const * argument)
 	lis2dw12_fifo_mode_set(&lis2dw12, LIS2DW12_STREAM_MODE);
 	// enable part from power-down
 	lis2dw12_data_rate_set(&lis2dw12, LIS2DW12_XL_ODR_25Hz);
+
+	uint32_t lastTerminalUpdate = 0;
+	uint32_t lastSend = 0;
 
 
 	/* Infinite loop */
@@ -489,17 +493,24 @@ void startAcceleroTask(void const * argument)
 		int16_t raw_acceleration[3];
 
 		lis2dw12_fifo_data_level_get(&lis2dw12, &samples);
+
 		for (uint8_t i = 0; i < samples; i++) {
 			// Read acceleration data
 			lis2dw12_acceleration_raw_get(&lis2dw12, raw_acceleration);
 		}
 
-		printf("X=%d Y=%d Z=%d\n", raw_acceleration[0], raw_acceleration[1], raw_acceleration[2]);
+		// namiesto HAL_GetTick() pouzit funkciu z RTOS
+		if ((HAL_GetTick() - lastTerminalUpdate) > 1000)
+		{
+			lastTerminalUpdate = HAL_GetTick();
+			printf("X=%d Y=%d Z=%d\n", raw_acceleration[0], raw_acceleration[1], raw_acceleration[2]);
+		}
 
-		osDelay(50);
-
-		xQueueSend(xVisualQueueHandle, &raw_acceleration[0], 0);
-
+		if ((HAL_GetTick() - lastSend) > 50)
+		{
+			lastSend = HAL_GetTick();
+			xQueueSend(xVisualQueueHandle, &raw_acceleration[0], 0);
+		}
 
   }
   /* USER CODE END startAcceleroTask */
